@@ -11,7 +11,7 @@ It will change the tasks
   * The Student is waiting for more than 12 hours for a review.
   * The Student asked a question.
 * ![#9ccc00](https://placehold.it/15/9ccc00/000000?text=+) Color to green if
-  * The last activity was by a Mentor and therefore the task is handled. Beware, sometimes this will give you a false-positive if the Mentor commented that he can't help. The Mentor should always seek for help on Slack, IRC, Google Groups then.
+  * The last activity was by a Mentor and therefore the task is handled. Beware, sometimes this will give you a false-positive if the Mentor commented that he/she can't help. The Mentor should always seek for help on Slack, IRC, Google Groups then.
 * ![#2894ed](https://placehold.it/15/2894ed/000000?text=+) Color to blue if
   * The Student is running out of time (less than 6 hours) and the clock is still ticking.
 * ![#ffcca4](https://placehold.it/15/ffcca4/000000?text=+) Transparency to 50%
