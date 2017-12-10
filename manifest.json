@@ -1,0 +1,27 @@
+{
+  "content_scripts": [
+    {
+      "run_at": "document_end",
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "libs/jquery-3.2.1.min.js",
+        "index.js"
+      ],
+      "matches": [
+        "*://codein.withgoogle.com/dashboard/task-instances/*"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "logo16.png",
+    "128": "logo128.png"
+  },
+  "manifest_version": 2,
+  "name": "Google Code-In Task Highlighter",
+  "description": "Highlight important tasks to handle",
+  "permissions": [],
+  "short_name": "codein-task-highlighter",
+  "version": "0.1"
+}
