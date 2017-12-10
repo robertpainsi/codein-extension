@@ -1,4 +1,5 @@
 ## Chrome Extension for Google Code-In
+(not using Chrome, see [#not-using-chrome](https://github.com/robertpainsi/codein-extension#not-using-chrome))
 
 This plugin will highlight Google Code-In tasks which needs attention at https://codein.withgoogle.com/dashboard/task-instances/in-progress/.
 
@@ -26,3 +27,7 @@ Tasks waiting for a review will have the default color ![#ff8f00](https://placeh
 4. Click on _Load unpacked extension_ and open the folder.
    * If you can't find the button on the top of the page, make sure that _Developer mode_ is enabled (https://developer.chrome.com/extensions/faq#faq-dev-01)
 5. To test it, go to https://codein.withgoogle.com/dashboard/task-instances/in-progress/
+
+### NOT USING CHROME?
+
+No problem, just c&p the code from the [index.js](https://raw.githubusercontent.com/robertpainsi/codein-extension/master/index.js) file into the console and press enter.

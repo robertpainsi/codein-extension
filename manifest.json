@@ -2,9 +2,7 @@
   "content_scripts": [
     {
       "run_at": "document_end",
-      "css": [
-        "style.css"
-      ],
+      "css": [],
       "js": [
         "libs/jquery-3.2.1.min.js",
         "index.js"

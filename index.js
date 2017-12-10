@@ -109,9 +109,13 @@ if (!location.pathname.match(/.*\/[0-9]+\//)) {
      * Colorize tasks
      */
     setInterval(() => {
-        tasksToIgnore.forEach((task) => $('a[href*="' + task.id + '"]').addClass('codein-extension-task-ignore'));
-        tasksHandled.forEach((task) => $('a[href*="' + task.id + '"]').addClass('codein-extension-task-handled'));
-        tasksToHighlight.forEach((task) => $('a[href*="' + task.id + '"]').addClass('codein-extension-task-highlighted'));
-        tasksRunningOutOfTime.forEach((task) => $('a[href*="' + task.id + '"]').addClass('codein-extension-task-running-out-of-time'));
+        tasksToIgnore.forEach((task) => setStyle(task.id, {'opacity': '0.5'}));
+        tasksHandled.forEach((task) => setStyle(task.id, {'color': '#9ccc00'}));
+        tasksToHighlight.forEach((task) => setStyle(task.id, {'color': '#e53935'}));
+        tasksRunningOutOfTime.forEach((task) => setStyle(task.id, {'color': '#2894ed'}));
     }, 2000);
+
+    function setStyle(taskId, css) {
+        $('a[href*="' + taskId + '"]').css(css);
+    }
 }
