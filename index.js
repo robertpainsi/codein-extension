@@ -8,13 +8,18 @@ if (!location.pathname.match(/.*\/[0-9]+\//)) {
     const ACTION = 1;
     const COMMENT = 2;
 
+    const ALL = -1;
+
     const tasksToIgnore = [];
     const tasksHandled = [];
     const tasksToHighlight = [];
     const tasksRunningOutOfTime = [];
 
-    (async function() {
-        for (let task of await getAllTasks()) {
+    /*
+     * Start point
+     */
+    (async function main() {
+        for (let task of await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`)) {
             if (task.last_update_by_student) {
                 handleLastUpdateByStudent(task)
             } else {
@@ -22,20 +27,6 @@ if (!location.pathname.match(/.*\/[0-9]+\//)) {
             }
         }
     }());
-
-    async function getAllTasks() {
-        const tasks = [];
-        let page = 1;
-        while (true) {
-            const data = await $.getJSON(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=${page}&page_size=100`);
-            tasks.push(...data.results);
-            page++;
-            if (!data.next) {
-                break;
-            }
-        }
-        return tasks;
-    }
 
     function handleLastUpdateByMentor(task) {
         if (isRunningOutOfTime(task)) {
@@ -46,8 +37,8 @@ if (!location.pathname.match(/.*\/[0-9]+\//)) {
     }
 
     function handleLastUpdateByStudent(task) {
-        $.getJSON('https://codein.withgoogle.com/api/program/current/taskupdate/?page=1&page_size=10&task_instance=' + task.id)
-            .then(({results: taskDetails}) => {
+        getLast10TaskDetails(task.id)
+            .then((taskDetails) => {
                 if (hasNoActivity(task, taskDetails)) {
                     tasksToIgnore.push(task);
                 } else if (isRunningOutOfTime(task)) {
@@ -82,9 +73,34 @@ if (!location.pathname.match(/.*\/[0-9]+\//)) {
         return false;
     }
 
+    const getLast10TaskDetails = (function() {
+        const detailsCount = 10;
+        const tasksCalls = new Map();
+        return async function(taskId) {
+            if (!tasksCalls.has(taskId)) {
+                tasksCalls.set(taskId, fetch(`https://codein.withgoogle.com/api/program/current/taskupdate/?page=1&page_size=${detailsCount}&task_instance=` + taskId, detailsCount));
+            }
+            return tasksCalls.get(taskId);
+        }
+    }());
+
     /*
      * Utils methods
      */
+    async function fetch(url, count = ALL) {
+        const items = [];
+        while (true) {
+            const {results, next} = await $.getJSON(url);
+            items.push(...results);
+            if (next && (count === ALL || items.length < count)) {
+                url = next;
+            } else {
+                break;
+            }
+        }
+        return (count > 0) ? items.slice(0, count) : items;
+    }
+
     function differenceInHours(from, to = new Date()) {
         return Math.abs(new Date(from) - to) / 36e5;
     }
