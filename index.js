@@ -58,7 +58,7 @@ function hasNoActivity(task, taskDetails) {
 }
 
 function isWaitingForComment(task, taskDetails) {
-    return task.status === CLAIMED && taskDetails[0].kind === COMMENT;
+    return task.last_update_by_student && taskDetails[0].kind === COMMENT;
 }
 
 function isRunningOutOfTime(task) {
