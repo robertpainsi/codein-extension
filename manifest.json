@@ -1,14 +1,13 @@
 {
   "content_scripts": [
     {
-      "run_at": "document_end",
       "css": [],
       "js": [
         "libs/jquery-3.2.1.min.js",
         "index.js"
       ],
       "matches": [
-        "*://codein.withgoogle.com/dashboard/task-instances/*"
+        "*://codein.withgoogle.com/dashboard/*"
       ]
     }
   ],
