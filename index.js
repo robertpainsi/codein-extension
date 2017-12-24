@@ -14,6 +14,8 @@ const tasksHandled = [];
 const tasksToHighlight = [];
 const tasksRunningOutOfTime = [];
 
+const taskStudentToHighlight = [];
+
 let waitUntilUserIsOnInProgressTab = setInterval(() => {
     if (isOnInProgressSite()) {
         clearInterval(waitUntilUserIsOnInProgressTab);
@@ -23,12 +25,28 @@ let waitUntilUserIsOnInProgressTab = setInterval(() => {
 
 async function main() {
     for (let task of await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`)) {
+        handleStudentPreRequirements(task);
         if (task.last_update_by_student) {
             handleLastUpdateByStudent(task)
         } else {
             handleLastUpdateByMentor(task);
         }
     }
+}
+
+function handleStudentPreRequirements(task) {
+    fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?claimed_by=${task.claimed_by_id}&my_tasks=false&page=1&page_size=20`)
+        .then((studentTasks) => {
+            let highlightStudent = false;
+
+            // TODO: Check for Students pre requirements and set highlightStudent = true; if necessary
+            for (let studentTask of studentTasks) {
+            }
+
+            if (highlightStudent) {
+                taskStudentToHighlight.push(task);
+            }
+        });
 }
 
 function handleLastUpdateByMentor(task) {
@@ -121,9 +139,15 @@ setInterval(() => {
         tasksHandled.forEach((task) => setStyle(task.id, {'color': '#9ccc00'}));
         tasksToHighlight.forEach((task) => setStyle(task.id, {'color': '#e53935'}));
         tasksRunningOutOfTime.forEach((task) => setStyle(task.id, {'color': '#2894ed'}));
+
+        taskStudentToHighlight.forEach((task) => setStudentStyle(task.claimed_by.display_name, {'color': '#e53935'}));
     }
 }, 2000);
 
 function setStyle(taskId, css) {
     $('a[href*="' + taskId + '"]').css(css);
+}
+
+function setStudentStyle(studentName, css) {
+    $('td:contains("' + studentName + '")').css(css);
 }
