@@ -3,6 +3,7 @@ const RUNNING_OUT_OF_TIME_IN_HOURS = 6;
 
 const CLAIMED = 1;
 const SUBMITTED = 4;
+const WAITING_FOR_GOOGLE_REVIEW_OF_PARENTAL_CONSENT = 8;
 
 const ACTION = 1;
 const COMMENT = 2;
@@ -27,7 +28,9 @@ async function main() {
     const taskPromises = [];
     await loadCache(await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`));
     for (let {task} of Object.values(cache)) {
-        if (task.last_update_by_student) {
+        if (task.status === WAITING_FOR_GOOGLE_REVIEW_OF_PARENTAL_CONSENT) {
+            tasksToIgnore.push(task);
+        } else if (task.last_update_by_student) {
             taskPromises.push(handleLastUpdateByStudent(task));
         } else {
             taskPromises.push(handleLastUpdateByMentor(task));
