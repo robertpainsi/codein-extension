@@ -81,7 +81,7 @@ async function getLast10TaskDetails(taskId) {
         return cache[taskId].taskDetails;
     } else {
         const taskDetailsCount = 10;
-        const taskDetails = await fetch(`https://codein.withgoogle.com/api/program/current/taskupdate/?page=1&page_size=${taskDetailsCount}&task_instance=` + taskId, taskDetailsCount);
+        const taskDetails = await fetch(`https://codein.withgoogle.com/api/program/current/taskupdate/?page=1&page_size=${taskDetailsCount}&task_instance=${taskId}`, taskDetailsCount);
         cache[taskId].taskDetails = taskDetails;
         return taskDetails;
     }
