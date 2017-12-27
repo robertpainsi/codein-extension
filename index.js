@@ -28,7 +28,8 @@ async function main() {
     const taskPromises = [];
     await loadCache(await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`));
     for (let {task} of Object.values(cache)) {
-        if (task.status === WAITING_FOR_GOOGLE_REVIEW_OF_PARENTAL_CONSENT) {
+        if (task.status === WAITING_FOR_GOOGLE_REVIEW_OF_PARENTAL_CONSENT
+            || task.comments_count === 0) {
             tasksToIgnore.push(task);
         } else if (task.last_update_by_student) {
             taskPromises.push(handleLastUpdateByStudent(task));
@@ -49,17 +50,11 @@ async function handleLastUpdateByMentor(task) {
 
 async function handleLastUpdateByStudent(task) {
     const taskDetails = await getLast10TaskDetails(task.id);
-    if (hasNoActivity(task, taskDetails)) {
-        tasksToIgnore.push(task);
-    } else if (isRunningOutOfTime(task)) {
+    if (isRunningOutOfTime(task)) {
         tasksRunningOutOfTime.push(task);
     } else if (isWaitingForComment(task, taskDetails) || isWaitingForReview(task, taskDetails)) {
         tasksToHighlight.push(task);
     }
-}
-
-function hasNoActivity(task, taskDetails) {
-    return task.status === CLAIMED && task.comments_count === 0;
 }
 
 function isWaitingForComment(task, taskDetails) {
