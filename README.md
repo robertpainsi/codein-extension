@@ -14,8 +14,9 @@ It will change the tasks
   * The last activity was by a Mentor and therefore the task is handled. Beware, sometimes this will give you a false-positive if the Mentor commented that he/she can't help. The Mentor should always seek for help on Slack, IRC, Google Groups then.
 * ![#2894ed](https://placehold.it/15/2894ed/000000?text=+) Color to blue if
   * The Student is running out of time (less than 6 hours) and the clock is still ticking.
-* ![#ffcca4](https://placehold.it/15/ffcca4/000000?text=+) Transparency to 50%
-  * If there is no activity on the task yet.
+* ![#ffcca4](https://placehold.it/15/ffcca4/000000?text=+) Transparency to 50% if
+  * There is no comment on the claimed task yet.
+  * The task has been approved and the Student is still waiting for parental consent.
 
 Tasks waiting for a review will have the default color ![#ff8f00](https://placehold.it/15/ff8f00/000000?text=+)
 
