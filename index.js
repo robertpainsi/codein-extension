@@ -24,18 +24,19 @@ let waitUntilUserIsOnInProgressTab = setInterval(() => {
 }, 200);
 
 async function main() {
+    const taskPromises = [];
     await loadCache(await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`));
     for (let {task} of Object.values(cache)) {
         if (task.last_update_by_student) {
-            await handleLastUpdateByStudent(task)
+            taskPromises.push(handleLastUpdateByStudent(task));
         } else {
-            handleLastUpdateByMentor(task);
+            taskPromises.push(handleLastUpdateByMentor(task));
         }
     }
-    await saveCache();
+    Promise.all(taskPromises).then(saveCache);
 }
 
-function handleLastUpdateByMentor(task) {
+async function handleLastUpdateByMentor(task) {
     if (isRunningOutOfTime(task)) {
         tasksRunningOutOfTime.push(task);
     } else {
