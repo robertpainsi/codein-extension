@@ -9,6 +9,8 @@ const COMMENT = 2;
 
 const ALL = -1;
 
+let cache = {};
+
 const tasksToIgnore = [];
 const tasksHandled = [];
 const tasksToHighlight = [];
@@ -22,13 +24,15 @@ let waitUntilUserIsOnInProgressTab = setInterval(() => {
 }, 200);
 
 async function main() {
-    for (let task of await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`)) {
+    await loadCache(await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`));
+    for (let {task} of Object.values(cache)) {
         if (task.last_update_by_student) {
-            handleLastUpdateByStudent(task)
+            await handleLastUpdateByStudent(task)
         } else {
             handleLastUpdateByMentor(task);
         }
     }
+    await saveCache();
 }
 
 function handleLastUpdateByMentor(task) {
@@ -39,18 +43,15 @@ function handleLastUpdateByMentor(task) {
     }
 }
 
-function handleLastUpdateByStudent(task) {
-    getLast10TaskDetails(task.id)
-        .then((taskDetails) => {
-            if (hasNoActivity(task, taskDetails)) {
-                tasksToIgnore.push(task);
-            } else if (isRunningOutOfTime(task)) {
-                tasksRunningOutOfTime.push(task);
-            } else if (isWaitingForComment(task, taskDetails)
-                || isWaitingForReview(task, taskDetails)) {
-                tasksToHighlight.push(task);
-            }
-        });
+async function handleLastUpdateByStudent(task) {
+    const taskDetails = await getLast10TaskDetails(task.id);
+    if (hasNoActivity(task, taskDetails)) {
+        tasksToIgnore.push(task);
+    } else if (isRunningOutOfTime(task)) {
+        tasksRunningOutOfTime.push(task);
+    } else if (isWaitingForComment(task, taskDetails) || isWaitingForReview(task, taskDetails)) {
+        tasksToHighlight.push(task);
+    }
 }
 
 function hasNoActivity(task, taskDetails) {
@@ -76,16 +77,16 @@ function isWaitingForReview(task, taskDetails) {
     return false;
 }
 
-const getLast10TaskDetails = (function() {
-    const detailsCount = 10;
-    const tasksCalls = new Map();
-    return async function(taskId) {
-        if (!tasksCalls.has(taskId)) {
-            tasksCalls.set(taskId, fetch(`https://codein.withgoogle.com/api/program/current/taskupdate/?page=1&page_size=${detailsCount}&task_instance=` + taskId, detailsCount));
-        }
-        return tasksCalls.get(taskId);
+async function getLast10TaskDetails(taskId) {
+    if (cache[taskId].taskDetails) {
+        return cache[taskId].taskDetails;
+    } else {
+        const taskDetailsCount = 10;
+        const taskDetails = await fetch(`https://codein.withgoogle.com/api/program/current/taskupdate/?page=1&page_size=${taskDetailsCount}&task_instance=` + taskId, taskDetailsCount);
+        cache[taskId].taskDetails = taskDetails;
+        return taskDetails;
     }
-}());
+}
 
 /*
  * Utils methods
@@ -110,6 +111,61 @@ function isOnInProgressSite() {
 
 function differenceInHours(from, to = new Date()) {
     return Math.abs(new Date(from) - to) / 36e5;
+}
+
+function findTaskWithId(tasks, id) {
+    for (let task of tasks) {
+        if (task.id === id) {
+            return task;
+        }
+    }
+    return null;
+}
+
+function hasChromeLocalStorage() {
+    return !!window.chrome && window.chrome.storage && window.chrome.storage.local;
+}
+
+/*
+ * Caching
+ */
+function loadCache(tasks) {
+    return new Promise(function(resolve, reject) {
+        if (hasChromeLocalStorage()) {
+            chrome.storage.local.get(null, function(cachedEntries) {
+                for (let task of tasks) {
+                    const cachedTask = (cachedEntries[task.id] || {}).task;
+                    if (cachedTask
+                        && cachedTask.modified === task.modified
+                        && cachedTask.status === task.status
+                        && cachedTask.comments_count === task.comments_count
+                    ) {
+                        cache[task.id] = cachedEntries[task.id];
+                    } else {
+                        cache[task.id] = {task};
+                    }
+                }
+                resolve();
+            });
+        } else {
+            for (let task of tasks) {
+                cache[task.id] = {task};
+            }
+            resolve();
+        }
+    });
+}
+
+function saveCache() {
+    return new Promise(function(resolve, reject) {
+        if (hasChromeLocalStorage()) {
+            chrome.storage.local.clear();
+            chrome.storage.local.set(cache);
+            resolve();
+        } else {
+            resolve();
+        }
+    });
 }
 
 /*

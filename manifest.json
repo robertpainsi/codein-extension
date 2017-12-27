@@ -18,7 +18,9 @@
   "manifest_version": 2,
   "name": "Google Code-In Task Highlighter",
   "description": "Highlight important tasks to handle",
-  "permissions": [],
+  "permissions": [
+    "storage"
+  ],
   "short_name": "codein-task-highlighter",
-  "version": "0.1"
+  "version": "2.0"
 }
