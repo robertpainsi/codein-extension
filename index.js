@@ -29,7 +29,7 @@ async function main() {
     await loadCache(await fetch(`https://codein.withgoogle.com/api/program/2017/taskinstance/?is_active=True&my_tasks=false&order=-last_update_by_student&page=1&page_size=100`));
     for (let {task} of Object.values(cache)) {
         if (task.status === WAITING_FOR_GOOGLE_REVIEW_OF_PARENTAL_CONSENT
-            || task.comments_count === 0) {
+            || (task.status === CLAIMED && task.comments_count === 0)) {
             tasksToIgnore.push(task);
         } else if (task.last_update_by_student) {
             taskPromises.push(handleLastUpdateByStudent(task));
