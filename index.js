@@ -56,7 +56,7 @@ async function handleLastUpdateByStudent(task) {
 }
 
 function hasNoActivity(task, taskDetails) {
-    return task.status === CLAIMED && task.comments_count === 0 && taskDetails.length === 1;
+    return task.status === CLAIMED && task.comments_count === 0;
 }
 
 function isWaitingForComment(task, taskDetails) {
