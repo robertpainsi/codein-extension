@@ -129,9 +129,9 @@ function hasChromeLocalStorage() {
  * Caching
  */
 function loadCache(tasks) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
         if (hasChromeLocalStorage()) {
-            chrome.storage.local.get(null, function(cachedEntries) {
+            chrome.storage.local.get(null, (cachedEntries) => {
                 for (let task of tasks) {
                     const cachedTask = (cachedEntries[task.id] || {}).task;
                     if (cachedTask
@@ -156,7 +156,7 @@ function loadCache(tasks) {
 }
 
 function saveCache() {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
         if (hasChromeLocalStorage()) {
             chrome.storage.local.clear();
             chrome.storage.local.set(cache);
